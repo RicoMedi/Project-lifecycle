@@ -1,6 +1,7 @@
 import React from 'react'
 import axios from 'axios'
-
+import Form from './Form'
+import TodoList from './TodoList'
 const URL = 'http://localhost:9000/api/todos'
 
 export default class App extends React.Component {
@@ -8,7 +9,7 @@ export default class App extends React.Component {
         todos: [],
         error: '',
         enterName:'',
-       
+        displayCompleted: true,
         }
   
 //initial axios get
@@ -50,6 +51,7 @@ onInputChange  = event => {
   postNewTodo = () => {
     axios.post(URL, {name: this.state.enterName})
     .then(res =>{
+      //the concat will only make one network response
        this.setState({...this.state, todos: this.state.todos.concat(res.data.data)})
        this.clearInputBox()
       })
@@ -69,27 +71,44 @@ onInputChange  = event => {
   this.setState({...this.state, error:`Error:${err.response.data.message}` })
  }
 
+ toggleComplete = id => ()=> {
+  axios.patch(`${URL}/${id}`)
+      .then(res=>{
+        this.setState({...this.state, todos: this.state.todos.map(td =>{
+            if(td.id !== id) return td
+            return res.data.data
+        })
+       })
+      })
+      .catch(this.setAxiosResponseError)
+    }
+
+  clearButton = () => {
+    this.setState({...this.state, displayCompleted: !this.state.displayCompleted})
+  }
+
   render() {
     
     return (
-      <div>
-        
+      
+     <div>
         <div id="error"> {this.state.error} </div> 
-          <div id='todos'>
-          <h1>Todos:</h1>
-        {
-          this.state.todos.map(td=>{
-            return <div key={td.id}>{td.name}</div>
-          })
-        } 
-        </div>
-        <form id="todoForm" onSubmit={this.submitNewTodo}>
-          <input value={this.state.enterName} type='text' onChange={this.onInputChange}  placeholder='Enter task'></input>
-          <input type='submit' onSubmit={this.doSubmit}></input>
-          <button> Clear Tasks </button>
-      </form>
-      </div>
+          
+         <TodoList
+          todos={this.state.todos}
+          displayCompleted={this.state.displayCompleted}
+          toggleComplete={this.toggleComplete}
+         />
+         
+        <Form  
+          submitNewTodo  = {this.submitNewTodo}
+          onInputChange = {this.onInputChange}
+          clearButton = {this.clearButton}
+          enterName = {this.state.enterName}
+          displayCompleted = {this.state.displayCompleted}
+        />
      
+     </div>
     )
   }
-}
+ }
