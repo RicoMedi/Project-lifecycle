@@ -8,6 +8,7 @@ export default class App extends React.Component {
         todos: [],
         error: '',
         enterName:'',
+       
         }
   
 //initial axios get
@@ -49,7 +50,7 @@ onInputChange  = event => {
   postNewTodo = () => {
     axios.post(URL, {name: this.state.enterName})
     .then(res =>{
-       this.fetchAllTodos()
+       this.setState({...this.state, todos: this.state.todos.concat(res.data.data)})
        this.clearInputBox()
       })
       .catch( this.setAxiosResponseError)
@@ -67,14 +68,6 @@ onInputChange  = event => {
   console.log(err)
   this.setState({...this.state, error:`Error:${err.response.data.message}` })
  }
-
- 
- 
-
-
-
-
-
 
   render() {
     
