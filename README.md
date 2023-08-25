@@ -42,7 +42,7 @@ Other browser/Node/NPM configurations might work but haven't been tested.
 ### API Endpoints
 
 The following endpoints exist in this project and should be explored with Postman prior to coding:
-
+ 
 - `GET http://localhost:9000/api/todos`
   1. Expects no payload
   2. Makes no changes on the server
